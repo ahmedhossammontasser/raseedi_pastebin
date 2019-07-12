@@ -1,0 +1,23 @@
+[
+  {
+    "model": "pastebin.Typepaste",
+    "pk": 1,
+    "fields": {
+      "name": "Public"
+    }
+  },
+  {
+    "model": "pastebin.Typepaste",
+    "pk": 2,
+    "fields": {
+      "name": "Private"
+    }
+  },
+  {
+    "model": "pastebin.Typepaste",
+    "pk": 3,
+    "fields": {
+      "name": "Certain User"
+    }
+  }
+]

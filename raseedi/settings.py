@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',    
     'pastebin'
 ]
 
@@ -122,6 +123,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
-        'DEFAULT_PERMISSION_CLASSES' : ( 'rest_framework.permissions.IsAuthenticatedOrReadOnly',) 
+        'DEFAULT_PERMISSION_CLASSES' : ( 'rest_framework.permissions.IsAuthenticatedOrReadOnly',) ,
+        'DEFAULT_AUTHENTICATION_CLASSES': ( 'rest_framework.authentication.TokenAuthentication', ),
 
 }

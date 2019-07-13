@@ -15,19 +15,40 @@ from rest_framework_csv.renderers import CSVRenderer
 
 from datetime import datetime
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ViewSet):
 	"""
-	A viewset for viewing and editing user instances.
+	A ViewSet for listing  users.
 	"""
-	serializer_class = UserSerializer
-	queryset = User.objects.all()
+	def list(self, request):
+		queryset = User.objects.all()
+		serializer = UserSerializer(queryset, many=True)
+		return Response(serializer.data)
 
 class TypepasteView(viewsets.ReadOnlyModelViewSet): 
-	""" ReadOnlyModelViewSet to prevent any from adding new type """
+	"""
+		ReadOnlyModelViewSet to prevent any from adding new type 
+	"""
 	queryset =  Typepaste.objects.all()
 	serializer_class = TypepasteSerializer
 
 class PasteView(viewsets.ModelViewSet):
+	"""
+		ModelViewSet  
+
+    retrieve:
+        Return the given paste.
+		Anonymous user can watch all public paste 
+
+    create:
+        Create a new paste.
+
+    destroy:
+        Delete a paste.
+
+    update:
+        Update a paste.
+
+    """	
 	queryset =  Paste.objects.all()
 	serializer_class = PasteSerializer
 	permission_classes = (permissions.AllowAny, IsOwnerOrReadOnly,)
@@ -40,7 +61,10 @@ class PasteView(viewsets.ModelViewSet):
 			serializer.save(owner = self.request.user)
 		
 	def list(self, request):
-		""" Returns a list of all pastes ,current user allowed to show/watch order by created_at"""
+		"""
+			Returns a list of all pastes which current_user allowed to show/watch order by created_at
+			Anonymous user can watch all public paste 
+		"""
 		queryset = Paste.objects.filter(models.Q(type=1) | models.Q(type=3  , allowedusers__id__exact= self.request.user.id)).order_by('-created_at')
 		
 		serializer = PasteSerializer(queryset, many=True)
@@ -48,8 +72,9 @@ class PasteView(viewsets.ModelViewSet):
 
 	@action(detail=False, permission_classes=[permissions.IsAuthenticated])
 	def get_own_pastes(self, request):
-		
-		""" Returns a list of users own pastes """
+		""" 
+			Returns a list of users own pastes 
+		"""
 		queryset = Paste.objects.filter(owner=request.user)
 
 		start_date = self.request.query_params.get('start_date', None)
@@ -68,7 +93,9 @@ class PasteView(viewsets.ModelViewSet):
 
 	@action(detail=False, renderer_classes=[CSVRenderer])
 	def statistics(request, format=None):
-
+		""" 
+			Returns csv file contain a list of users_id and counter of own pastes  
+		"""
 		pastes_grouped_by_owner_id = Paste.objects.all().values('owner' ).annotate(total=Count('type')).order_by('total')
 		serializer = SatatisticSerializer(pastes_grouped_by_owner_id, many=True)
 		return Response( serializer.data )

@@ -1,15 +1,17 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Count
 
 from .models import Paste, Typepaste
-from .serializers import PasteSerializer, TypepasteSerializer, UserSerializer
+from .serializers import PasteSerializer, TypepasteSerializer, UserSerializer, SatatisticSerializer
 from .permissions import IsOwnerOrReadOnly
 
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import action
+from rest_framework_csv.renderers import CSVRenderer
 
 from datetime import datetime
 
@@ -62,3 +64,11 @@ class PasteView(viewsets.ModelViewSet):
 
 		serializer = PasteSerializer(queryset, many=True)
 		return Response(serializer.data)
+
+
+	@action(detail=False, renderer_classes=[CSVRenderer])
+	def statistics(request, format=None):
+
+		pastes_grouped_by_owner_id = Paste.objects.all().values('owner' ).annotate(total=Count('type')).order_by('total')
+		serializer = SatatisticSerializer(pastes_grouped_by_owner_id, many=True)
+		return Response( serializer.data )

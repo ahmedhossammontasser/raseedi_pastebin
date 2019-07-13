@@ -14,11 +14,12 @@ class PasteSerializer(serializers.ModelSerializer):
 		fields = ('id', 'type','type_name', 'owner_name', 'text', 'allowedusers', 'created_at')
 		read_only_fields = ('owner','type_name', 'owner_name')
 
-
 class TypepasteSerializer(serializers.HyperlinkedModelSerializer):
-
 	class Meta: 
 		model = Typepaste
 		fields = ('id', 'name', 'url') 
 
 
+class SatatisticSerializer(serializers.Serializer):
+	owner = serializers.CharField()
+	total = serializers.IntegerField()
